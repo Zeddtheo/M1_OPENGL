@@ -214,7 +214,7 @@ void dessiner_facette(GLfloat xOffset, GLfloat yOffset, GLfloat zOffset,GLfloat 
     }
 }
 
-void gear_rotate()
+void gear_rotate()1
 {
     gear1_rotation += 1.0;
     gear2_rotation -= 1.0;
