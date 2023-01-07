@@ -170,7 +170,7 @@ void dessiner_facettes_bloc(int angle_roue, GLfloat r_trou, GLfloat r_roue, GLfl
     if(flag_fill){
         glColor3f(1.0,1.0,1.0);
     }else{
-        glColor3f(color[0]*0.3,color[1]*0.3,color[2]*0.3);
+        glColor3f(color[0]*0.6,color[1]*0.6,color[2]*0.6);
     }
     glVertex3f(cos(angle_roue/2*PI/180)*r_trou, sin(angle_roue/2*PI/180)*r_trou,ep_roue/2);
     glVertex3f(cos(angle_roue*PI/180)*r_trou, sin(angle_roue*PI/180)*r_trou,ep_roue/2);
@@ -183,7 +183,7 @@ void dessiner_facettes_bloc(int angle_roue, GLfloat r_trou, GLfloat r_roue, GLfl
     if(flag_fill){
         glColor3f(1.0,1.0,1.0);
     }else{
-        glColor3f(color[0],color[1],color[2]);
+        glColor3f(color[0]*0.4,color[1]*0.4,color[2]*0.4);
     }
     glVertex3f(r_roue-h_dent/2, 0, ep_roue/2);
     glVertex3f(cos(angle_roue/4*PI/180)*(r_roue-h_dent/2),sin(angle_roue/4*PI/180)*(r_roue-h_dent/2),ep_roue/2);
@@ -195,7 +195,7 @@ void dessiner_facettes_bloc(int angle_roue, GLfloat r_trou, GLfloat r_roue, GLfl
     if(flag_fill){
         glColor3f(1.0,1.0,1.0);
     }else{
-        glColor3f(color[0],color[1],color[2]);
+        glColor3f(color[0]*0.3,color[1]*0.3,color[2]*0.3);
     }
     glVertex3f(cos(angle_roue/4*PI/180)*(r_roue-h_dent/2),sin(angle_roue/4*PI/180)*(r_roue-h_dent/2),ep_roue/2);
     glVertex3f(cos(angle_roue/2*PI/180)*(r_roue+h_dent/2),sin(angle_roue/2*PI/180)*(r_roue+h_dent/2),ep_roue/2);
@@ -219,7 +219,7 @@ void dessiner_facettes_bloc(int angle_roue, GLfloat r_trou, GLfloat r_roue, GLfl
     if(flag_fill){
         glColor3f(1.0,1.0,1.0);
     }else{
-        glColor3f(color[0],color[1],color[2]);
+        glColor3f(color[0]*0.8,color[1]*0.8,color[2]*0.8);
     }
     glVertex3f(cos(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),sin(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),ep_roue/2);
     glVertex3f(cos(angle_roue*PI/180)*(r_roue-h_dent/2),sin(angle_roue*PI/180)*(r_roue-h_dent/2),ep_roue/2);
@@ -250,7 +250,7 @@ void dessiner_facette(int angle_roue, GLfloat r_trou, GLfloat r_roue, GLfloat xO
         dessiner_facettes_bloc(angle_roue, r_trou, r_roue, color,ep_roue);
         glPopMatrix();
 
-        new_angle_roue+=36;
+        new_angle_roue+=angle_roue;
     }
 }
 
