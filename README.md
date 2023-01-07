@@ -1,4 +1,4 @@
-# M1_OPENGL_Gear
+# M1_OPENGL_Gears
 `
 $make &&
 ./Roue
