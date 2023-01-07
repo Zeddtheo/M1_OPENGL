@@ -16,11 +16,12 @@ int angle_roue = 360/10;
 float r_trou = 0.5;
 float r_roue = 1.0;
 float h_dent = 0.25;
-GLfloat ep_roue = 0.2;
+
 int flag_fill = 1;
-GLfloat gear1_rotation;
-GLfloat gear2_rotation;
-float center_offset = 0;
+
+GLfloat gear1_rotation = 0.0;
+GLfloat gear2_rotation = 0.0;
+
 
 GLfloat coul_r[3] = {255.0f,0.0f,0.0f};
 GLfloat coul_v[3] = {0.0f,255.0f,0.0f};
@@ -43,8 +44,8 @@ void do_projection (void)
     float wr = cam_hr * aspect_ratio;
     switch (cam_proj) {
         case P_ORTHO :
-            printf ("glOrtho (%.1f, %.1f, %.1f, %.1f, %.1f, %.1f)  cam_z = %.1f\n",
-                -wr, wr, -cam_hr, cam_hr, cam_near, cam_far, cam_z);
+            printf ("glOrtho (%.1f, %.1f, %.1f, %.1f, %.1f, %.1f)  cam_z = %.1f, flag_fill = %d\n",
+                -wr, wr, -cam_hr, cam_hr, cam_near, cam_far, cam_z,flag_fill);
             glOrtho (-wr, wr, -cam_hr, cam_hr, cam_near, cam_far);
             break;
         case P_FRUSTUM :
@@ -90,7 +91,7 @@ void print_help ()
 void dessiner_bloc_dent(GLfloat color[3]){
     glBegin(GL_TRIANGLE_FAN);
     if(!flag_fill){
-        glColor3f(color[0]*0.8,0.8,0.8);
+        glColor3f(color[0],color[1],color[2]);
     }else{
         glColor3f(1.0,1.0,1.0);
     }
@@ -113,38 +114,38 @@ void dessiner_bloc_dent(GLfloat color[3]){
     glEnd();
 }
 
-void dessiner_cote_roue(){
-    int new_angle_roue = 0;
-    while(new_angle_roue<=360){
+void dessiner_cote_roue(GLfloat xOffset, GLfloat yOffset, GLfloat zOffset,GLfloat angle_offset, int isClockwise, GLfloat color[3]){
+    GLfloat new_roue_angle = 0;
+    while (new_roue_angle <= 360)
+    {
         glPushMatrix();
-        glTranslatef(0,0,-0.05);
-        glRotatef(gear1_rotation,0,0,1);
-        glScalef(0.5,0.5,0);
-        glRotatef(new_angle_roue,0,0,1);
-        dessiner_bloc_dent(coul_r);
+        glTranslatef(xOffset,yOffset,zOffset);
+        if(isClockwise){
+            glRotatef(gear1_rotation,0,0,1);
+        }else{
+            glRotatef(gear2_rotation,0,0,1);
+        }
+        glRotatef(new_roue_angle + angle_offset,0,0,1);
+        dessiner_bloc_dent(color);
         glPopMatrix();
 
-        glPushMatrix();
-        glTranslatef(0,0,-0.1);
-        glTranslatef(1.0,0,0);
-        glRotatef(gear2_rotation,0,0,1);
-        glScalef(0.5,0.5,0);
-        glRotatef(new_angle_roue+9,0,0,1);
-        dessiner_bloc_dent(coul_v);
-        glPopMatrix();
-        
-        new_angle_roue+=36;
+        new_roue_angle+=36;
     }
 }
 
-void dessiner_roue(){
+void dessiner_roue(GLfloat xOffset, GLfloat yOffset, GLfloat zOffset,  GLfloat angle_offset, GLfloat ep_roue, int isClockwise, GLfloat color[3]){
+    glPushMatrix();
     glTranslatef(0,0,ep_roue/2.0);
-    dessiner_cote_roue();
-    glTranslatef(0,0,-ep_roue/2.0);
-    dessiner_cote_roue();
+    dessiner_cote_roue(xOffset,yOffset,0,angle_offset,isClockwise,color);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0,0,-(ep_roue/2.0));
+    dessiner_cote_roue(xOffset,yOffset,0,angle_offset,isClockwise,color);
+    glPopMatrix();
 }
 
-void dessiner_facettes_bloc(GLfloat color[3]){
+void dessiner_facettes_bloc(GLfloat color[3],GLfloat ep_roue){
     //AHH'A'
     glBegin(GL_QUADS);
     glColor3f(color[0]*0.6,0.6,0.6);
@@ -179,7 +180,7 @@ void dessiner_facettes_bloc(GLfloat color[3]){
     glEnd();
     //DEE'D'
     glBegin(GL_QUADS);
-    glColor3f(color[0],color[1],color[2]);
+    glColor3f(color[0]*0.5,color[1]*0.5,color[2]*0.5);
     glVertex3f(cos(angle_roue/2*PI/180)*(r_roue+h_dent/2),sin(angle_roue/2*PI/180)*(r_roue+h_dent/2),ep_roue/2);
     glVertex3f(cos(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),sin(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),ep_roue/2);
     glVertex3f(cos(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),sin(angle_roue/4*3*PI/180)*(r_roue+h_dent/2),-ep_roue/2);
@@ -195,25 +196,19 @@ void dessiner_facettes_bloc(GLfloat color[3]){
     glEnd();
 }
 
-void dessiner_facette(){
+void dessiner_facette(GLfloat xOffset, GLfloat yOffset, GLfloat zOffset,GLfloat angle_offset,GLfloat ep_roue,int isClockwise,GLfloat color[3]){
     int new_angle_roue = 0;
     while(new_angle_roue<=360){
         glPushMatrix();
-        glRotatef(gear1_rotation,0,0,1);
-        glScalef(0.5,0.5,0.5);
-        glRotatef(new_angle_roue,0,0,1);
-        dessiner_facettes_bloc(coul_r);
+        glTranslatef(xOffset,yOffset,zOffset);
+        if(isClockwise){
+            glRotatef(gear1_rotation,0,0,1);
+        }else{
+            glRotatef(gear2_rotation,0,0,1);
+        }
+        glRotatef(new_angle_roue+angle_offset,0,0,1);
+        dessiner_facettes_bloc(color,ep_roue);
         glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef(1.0,0,0);
-        glRotatef(gear2_rotation,0,0,1);
-        glScalef(0.5,0.5,1);
-        glRotatef(new_angle_roue+9,0,0,1);
-        dessiner_facettes_bloc(coul_v);
-        glPopMatrix();
-
-
 
         new_angle_roue+=36;
     }
@@ -221,11 +216,8 @@ void dessiner_facette(){
 
 void gear_rotate()
 {
-    // Update the rotation angles for the gears
     gear1_rotation += 1.0;
     gear2_rotation -= 1.0;
-
-    // cour_rraw the scene
     glutPostRedisplay();
 }
 
@@ -296,9 +288,15 @@ void on_display_win(void) {
     
     glRotatef (anim_angle_roue, 0, 1.0, 0.1);
     glColor3f (1.0, 1.0, 1.0);
-
-    dessiner_roue();
-    dessiner_facette();
+    //Roue rouge
+    dessiner_roue(-1.0,0,0,0.0,0.2f,1,coul_r);
+    dessiner_facette(-1,0,0,0.0,0.2f,1,coul_r);
+    //Roue vert
+    dessiner_roue(1.0, 0, 0, 9.0f, 0.2f, 0,coul_v);
+    dessiner_facette(1.0 , 0, 0, 9.0f, 0.2f, 0, coul_v);
+    //Roue bleu
+    dessiner_roue(1.0, 0, 0, 9.0f, 0.2f, 0,coul_v);
+    dessiner_facette(1.0 , 0, 0, 9.0f, 0.2f, 0, coul_v);
 
     glutSwapBuffers();
 }
