@@ -1,6 +1,6 @@
 # M1_OPENGL_Gear
 `
-$make  
+$make
 
 ./Roue
 `  
